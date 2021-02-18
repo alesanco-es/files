@@ -44,7 +44,8 @@ cd 'C:\Program Files\winlogbeat\'
 
 # Get Winlogbeat config
 Write-Output "[+] - Downloading Winlogbeat config"
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/alesanco-es/files/master/winlogbeat.yml -OutFile winlogbeat.yml
+#Invoke-WebRequest -Uri https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile sysmonconfig-export.xml
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/alesanco-es/files/master/sysmonconfig-export-net-all.xml -OutFile sysmonconfig-export.xml
 
 # Set Logstash server
 Write-Output "[+] - Setting Logstash in Winlogbeat config"
