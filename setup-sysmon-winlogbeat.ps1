@@ -20,8 +20,8 @@ Expand-Archive .\Sysmon.zip -DestinationPath .
 
 # Download SwiftOnSecurity config
 Write-Output "[+] - Download SwiftOnSeccurity Sysmon config"
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile sysmonconfig-export.xml
-
+#Invoke-WebRequest -Uri https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile sysmonconfig-export.xml
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/alesanco-es/files/master/sysmonconfig-export-net-all.xml -OutFile sysmonconfig-export.xml
 # Install Sysmon
 Write-Output "[+] - Starting Sysmon with SwiftOnSeccurity config"
 .\Sysmon.exe -accepteula -i .\sysmonconfig-export.xml
@@ -44,8 +44,7 @@ cd 'C:\Program Files\winlogbeat\'
 
 # Get Winlogbeat config
 Write-Output "[+] - Downloading Winlogbeat config"
-#Invoke-WebRequest -Uri https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile sysmonconfig-export.xml
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/alesanco-es/files/master/sysmonconfig-export-net-all.xml -OutFile sysmonconfig-export.xml
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/alesanco-es/files/master/winlogbeat.yml -OutFile winlogbeat.yml
 
 # Set Logstash server
 Write-Output "[+] - Setting Logstash in Winlogbeat config"
@@ -61,38 +60,3 @@ Write-Output "[+] - Start Winlogbeat service"
 Set-Service -Name "winlogbeat" -StartupType automatic
 Start-Service -Name "winlogbeat"
 Get-Service -Name "winlogbeat"
-
-################################################# Install/Setup Filebeat #################################################
-cd $ENV:TEMP
-
-# Download Filebeat
-Write-Output "[+] - Downloading Filebeat"
-Invoke-WebRequest -Uri https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-$FILEBEAT_VERSION-windows-x86_64.zip -OutFile filebeat-$FILEBEAT_VERSION-windows-x86_64.zip
-
-# Extract zip
-Write-Output "[+] - Unzipping Filebeat"
-Expand-Archive .\filebeat-$FILEBEAT_VERSION-windows-x86_64.zip -DestinationPath .
-
-# Move directory
-Write-Output "[+] - Moving filebeat directory to C:\Program Files\filebeat"
-mv .\filebeat-$FILEBEAT_VERSION-windows-x86_64 'C:\Program Files\filebeat'
-cd 'C:\Program Files\filebeat\'
-
-# Get Winlogbeat config
-Write-Output "[+] - Downloading filebeat config"
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/alesanco-es/files/master/filebeat.yml -OutFile filebeat.yml
-
-# Set Logstash server
-Write-Output "[+] - Setting Logstash in filebeat config"
-(Get-Content -Path .\filebeat.yml -Raw) -replace "logstash_ip_addr","$logstash_ip_addr" | Set-Content -Path .\filebeat.yml
-(Get-Content -Path .\filebeat.yml -Raw) -replace "logstash_port","$logstash_port" | Set-Content -Path .\filebeat.yml
-
-# Install filebeat
-Write-Output "[+] - Install filebeat as a service"
-powershell -Exec bypass -File .\install-service-filebeat.ps1
-
-# Start filebeat service
-Write-Output "[+] - Start filebeat service"
-Set-Service -Name "filebeat" -StartupType automatic
-Start-Service -Name "filebeat"
-Get-Service -Name "filebeat"
